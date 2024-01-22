@@ -9,6 +9,15 @@ on:
       - 'developer/**'
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build Dummy
+        run: echo Dummy Build Done
+
   test:
     runs-on: ubuntu-latest
 
