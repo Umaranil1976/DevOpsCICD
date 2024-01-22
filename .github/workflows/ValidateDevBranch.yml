@@ -1,0 +1,45 @@
+name: Pull Request Validation
+
+on:
+  push:
+    branches:
+      - 'developer/**'
+  pull_request:
+    branches:
+      - 'developer/**'
+
+jobs:
+  validate-developer-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run tests
+      run: python run_tests.py
+
+    - name: Check for successful build
+      id: check-build
+      run: echo "::set-output name=success::true"
+      continue-on-error: true
+
+  merge-to-master:
+    needs: validate-developer-branch
+    if: ${{ needs.validate-developer-branch.outputs.success == 'true' }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Merge to master
+      run: git merge --no-ff ${{ github.event.before }}
